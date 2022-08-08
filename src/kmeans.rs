@@ -1,48 +1,59 @@
 use ndarray::prelude::*;
-pub struct KMeans {
-    centroid: Vec<Point>,
+use crate::point::{*, self};
+type Vector<'a> = ArrayView1<'a, f32>;
+type VectorMut = Array1<f32>;
+type Matrix = Array2<f32>;
 
+pub struct KMeans {
+    centroid: Matrix,
+    cluster: Array1<Vec<usize>>,
 }
 impl KMeans {
-    pub fn new(data_size: u32) -> KMeans {
-        let centroid = Vec::<Point>::new();
-
+    pub fn new(k: usize, x: usize) -> KMeans {
+        let centroid = Array2::<f32>::zeros((k, x));
+        let cluster = Array1::<Vec<usize>>::from_elem(k, Vec::new());
         KMeans {
             centroid,
+            cluster,
         }
     }
 
-    
-}
-
-pub struct Point {
-    pub x: Array1<f32>,
-}
-impl Point {
-    pub fn square_distance(& self) -> f32 {
-        let mut sum = 0.;
-        for x in &self.x {
-            sum += x * x;
-        }
-        sum
-    }
-    pub fn difference_from(&self, other: &Point) -> Array1<f32> {
-        // Find the smaller of the two arrays.
-        let len_self = self.x.len();
-        let len_other = other.x.len();
-        let self_smaller = len_self <= len_other;
-        let len = if self_smaller {
-            len_self
-        }
-        else {
-            len_other
-        };
-
-        // Subtract each element pairwise using the index value we found earlier.
-        let mut dif = Array1::<f32>::zeros(len);
+    pub fn train(&mut self, input: &Array2<f32>) {
+        // For each input point, assign index to a cluster.
+        let len = input.len();
         for i in 0..len {
-            dif[i] = self.x[i] - other.x[i];
+            let point = input.row(i);
+            let cluster = self.find_cluster(&point);
+            self.cluster[cluster].push(i);
         }
-        dif
     }
+
+    fn find_cluster(&self, input: &Vector) -> usize {
+        let mut index = 0;
+        let mut distance = f32::MAX;
+
+        let len = self.centroid.len();
+        for i in 0..len {
+            let dif_dist = point::square_length(&sub(input, &self.centroid.row(i)).view());
+            if dif_dist < distance {
+                index = i;
+                distance = dif_dist;
+            }
+        }
+        index
+    }
+
+    fn average_centroid(centroid: &mut VectorMut, input: &Matrix, index: &Vector) {
+        // Zero out the centroid.
+        for i in 0..centroid.len() {
+            centroid[i] = 0.;
+        }
+
+        // Sum columns from input based on index vector.
+        for i in 0..index.len() {
+            //centroid[i] += input.row(index(i));
+        }
+
+    }
+
 }

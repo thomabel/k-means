@@ -3,15 +3,18 @@ Thomas Abel
 2022-08-08
 Machine Learning
 */
-
 use print_data::*;
 use constants::*;
 use rand::seq::SliceRandom;
+use ndarray::prelude::*;
+
+use crate::kmeans::KMeans;
 
 mod read;
 mod print_data;
 mod constants;
 mod kmeans;
+mod point;
 
 fn main() {
     let path = [
@@ -32,6 +35,9 @@ fn main() {
         },
     }
     //_print_matrix(&input.view(), "INPUT");
+
+    let mut kmeans = KMeans::new(K, INPUTS);
+    kmeans.train(&input);
 
     println!("Ending program.");
 }
