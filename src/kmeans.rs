@@ -33,13 +33,22 @@ impl KMeans {
                 centroid[x] = vector[x];
             }
         }
-        println!("INITIAL");
-        self._print_centroids();
+        //println!("INITIAL");
+        //self._print_centroids();
     }
 
     // Prints all values of the centroids.
     pub fn _print_centroids(&self) {
         _print_matrix(&self.centroid.view(), "CENTROIDS");
+    }
+
+    // 
+    pub fn get_centroid(&self) -> &Matrix {
+        &self.centroid
+    }
+
+    pub fn get_cluster(&self) -> &Array1<Vec<usize>> {
+        &self.cluster
     }
 
     // Trains the model by assigning vectors to centroids and
@@ -49,14 +58,13 @@ impl KMeans {
         let mut cont = true;
         while cont {
             self.reset_cluster();
-
             self.assign_clusters(input);
             cont = self.update_centroids(input);
-            
             counter += 1;
-            println!("GEN: {}", counter);
-            let error = self.error(input);
-            println!("ERROR: {:.6} \n", error);
+            
+            //println!("GEN: {}", counter);
+            //let error = self.error(input);
+            //println!("ERROR: {:.6} \n", error);
             //self._print_centroids();
         }
     }
