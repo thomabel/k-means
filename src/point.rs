@@ -30,7 +30,7 @@ pub fn sub(lhs: &Point, rhs: &Point) -> PointMut {
     point
 }
 
-pub fn copy(into: &mut PointMut, from: &Point) {
+pub fn _copy(into: &mut PointMut, from: &Point) {
     let len = into.len();
     for i in 0..len {
         into[i] = from[i];
