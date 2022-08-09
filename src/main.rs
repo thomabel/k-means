@@ -15,6 +15,8 @@ mod constants;
 mod kmeans;
 mod point;
 
+type Matrix = Array2<f32>;
+
 fn main() {
     // Read the data.
     let path = [
@@ -22,7 +24,7 @@ fn main() {
     ];
     let path_index = 0;
     let read = read::read_csv(path[path_index], INPUTS);
-    let input;
+    let input: Matrix;
 
     match read {
         Ok(o)=> {
@@ -36,18 +38,33 @@ fn main() {
     }
     //_print_matrix(&input.view(), "INPUT");
 
-    // Set up the model.
-    let mut kmeans = KMeans::new(K, INPUTS);
-    let size = input.len_of(Axis(0));
-    let index = choose_random_index(K, size);
-    kmeans.assign_centroids(&input, &index);
+    let results = model(&input, R);
 
-    // Train the model.
-    kmeans.train(&input);
+    print_data::_print_vector(&Array::from_vec(results.1).view(), "ERROR");
 
     println!("Ending program.");
 }
 
+fn model(input: &Matrix, iterations: usize) -> (Vec<KMeans>, Vec<f32>) {
+    let mut model = Vec::with_capacity(iterations);
+    let mut error = Vec::with_capacity(iterations);
+
+    for r in 0..iterations {
+        // Set up the model.
+        model.push(KMeans::new(K, INPUTS));
+        let size = input.len_of(Axis(0));
+        let index = &choose_random_index(K, size);
+        model[r].assign_centroids(input, index);
+    
+        // Train the model.
+        model[r].train(input);
+
+        // Find the error.
+        error.push(model[r].error(input));
+    }
+
+    (model, error)
+}
 
 
 // Chooses a random set of indicies to use as initial points.

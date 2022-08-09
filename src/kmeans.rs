@@ -48,6 +48,8 @@ impl KMeans {
         let mut counter = 0;
         let mut cont = true;
         while cont {
+            self.reset_cluster();
+
             self.assign_clusters(input);
             cont = self.update_centroids(input);
             
@@ -55,9 +57,7 @@ impl KMeans {
             println!("GEN: {}", counter);
             let error = self.error(input);
             println!("ERROR: {:.6} \n", error);
-            self._print_centroids();
-
-            self.reset_cluster();
+            //self._print_centroids();
         }
     }
 
